@@ -3,71 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULTRATHINK</title>
+    <title>HAREZMİ ÇALIŞMA PANELİ</title>
     <style>
         body {
             margin: 0; padding: 0; background-color: #000; color: white;
-            font-family: 'Segoe UI', sans-serif; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-            /* ARKA PLAN BURADA - Dosya adını screenshots yaptık */
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('screenshots.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('screenshots.jpg');
+            background-size: cover; background-position: center;
         }
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 1000; cursor: pointer;
+        .panel { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* HAREZMİ BAŞLIĞI - MAVİ VE BÜYÜK */
+        .brand-header {
+            font-size: 3rem; font-weight: 900; color: #00f2ff; 
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.5); margin-bottom: 10px;
+            letter-spacing: 4px;
         }
-        #splash-screen h1 { font-size: 3.5rem; color: #ff0000; text-shadow: 0 0 30px rgba(255,0,0,0.6); }
-        #main-ui { display: none; width: 100%; padding: 20px; }
-        #timer-display { font-size: 5.5rem; font-weight: bold; margin-bottom: 25px; }
-        .btn-main { background-color: #ff0000; color: white; border: none; padding: 18px 45px; font-size: 1.1rem; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 20px rgba(255,0,0,0.5); }
-        .btn-stop { background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 12px 25px; border-radius: 30px; cursor: pointer; margin-top: 10px; }
-        .music-panel { margin-top: 40px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 20px; }
+
+        /* DERS PANELİ */
+        #timer-display { font-size: 5.5rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
+        .btn-main { background: #ff0000; color: white; border: none; padding: 18px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; }
+
+        /* OYUN PANELİ */
+        #fun-panel { background: linear-gradient(135deg, #0a0a0a 0%, #001f3f 100%); }
+        .memory-game { display: grid; grid-template-columns: repeat(4, 65px); grid-gap: 10px; justify-content: center; margin: 15px 0; }
+        .card { width: 65px; height: 65px; background: rgba(0, 242, 255, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; border: 2px solid #00f2ff; }
+        .card.flipped { background: #fff; color: #000; }
+        .card.matched { visibility: hidden; }
+
+        /* MÜZİK VE NAVİGASYON */
+        .music-control { margin-top: 25px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.2); }
+        .nav-btn { position: fixed; bottom: 20px; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 100; }
     </style>
 </head>
-<body>
-    <div id="splash-screen" onclick="startApp()">
-        <h1>ULTRATHINK</h1>
-        <p>BAŞLAMAK İÇİN DOKUN</p>
-    </div>
-    <div id="main-ui">
-        <div id="task-display" style="font-weight: bold; color: #38bdf8; margin-bottom: 10px;">GÖREV BEKLENİYOR...</div>
+<body onload="initApp()">
+
+    <div id="work-panel" class="panel" style="display:flex;">
+        <div class="brand-header">HAREZMİ</div>
+        <div id="task-display" style="font-size: 1.2rem; color: #ccc; margin-bottom: 5px;">HAZIRSAN BAŞLAYALIM!</div>
         <div id="timer-display">00:00</div>
-        <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button><br>
-        <button class="btn-stop" id="pause-btn" onclick="togglePause()">DURDUR</button>
-        <div class="music-panel">
-            <p id="current-song">🎵 Odaklanma Müziği</p>
-            <button onclick="changeSong()" style="background: none; border: 1px solid #38bdf8; color: #38bdf8; padding: 5px 10px; border-radius: 10px; cursor: pointer;">ŞARKI DEĞİŞTİR</button>
+        <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button>
+        
+        <div class="music-control">
+            <p id="song-name" style="font-size: 0.8rem; margin-bottom: 5px; color: #00f2ff;">🎵 Dinlendirici Müzik</p>
+            <button onclick="changeSong()" style="background:none; border:1px solid #00f2ff; color:#00f2ff; padding:5px 12px; border-radius:10px; font-size:0.7rem; cursor:pointer;">ŞARKI DEĞİŞTİR</button>
         </div>
+
+        <button class="nav-btn" onclick="showPanel('fun-panel')" style="right: 20px; background: #00f2ff; color: #000;">OYUN MODU ➔</button>
     </div>
-    <audio id="bg-audio" loop><source id="audio-src" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+    <div id="fun-panel" class="panel">
+        <div class="brand-header" style="font-size: 2rem;">HAREZMİ OYUN</div>
+        <div class="memory-game" id="game-board"></div>
+        <button onclick="resetGame()" style="background:none; border:1px solid #00f2ff; color:#00f2ff; padding:8px 20px; border-radius:10px; cursor:pointer;">YENİDEN BAŞLAT</button>
+        
+        <button class="nav-btn" onclick="showPanel('work-panel')" style="left: 20px; background: #ff4444; color: #fff;">⬅ DERS MODU</button>
+    </div>
+
+    <audio id="bg-audio" loop><source id="audio-src" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"></audio>
+
     <script>
         const tasks = [
-            {t: "20 Matematik Sorusu Çöz", d: 25}, {t: "Fen Bilgisi Özetini Oku", d: 15},
-            {t: "10 İngilizce Kelime Ezberle", d: 10}, {t: "15 Sayfa Kitap Oku", d: 20},
-            {t: "10 Dakika Masanı Düzenle", d: 10}, {t: "5 Dakika Gözlerini Dinlendir", d: 5}
+            {t:"20 Matematik Sorusu", d:25}, {t:"Fen Bilgisi Çalış", d:15}, 
+            {t:"15 Sayfa Kitap Oku", d:20}, {t:"İngilizce Tekrar", d:12}
         ];
-        let timeLeft = 0, timerId = null, isPaused = false;
+        const playlist = [
+            {n: "Yağmur Sesi", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
+            {n: "Sakin Piyano", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"},
+            {n: "Orman Sesleri", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3"}
+        ];
+
+        let timeLeft = 0, timerId = null, songIndex = 0;
         const audio = document.getElementById('bg-audio');
-        function startApp() { document.getElementById('splash-screen').style.display = 'none'; document.getElementById('main-ui').style.display = 'block'; audio.play(); }
+
+        function initApp() {
+            window.onclick = () => { audio.play(); window.onclick = null; };
+        }
+        
+        function showPanel(id) { 
+            document.querySelectorAll('.panel').forEach(p => p.style.display = 'none'); 
+            document.getElementById(id).style.display = 'flex';
+            if(id === 'fun-panel') resetGame();
+        }
+
+        function changeSong() {
+            songIndex = (songIndex + 1) % playlist.length;
+            document.getElementById('song-name').innerText = "🎵 " + playlist[songIndex].n;
+            document.getElementById('audio-src').src = playlist[songIndex].s;
+            audio.load(); audio.play();
+        }
+
         function generateTask() {
             if(timerId) clearInterval(timerId);
-            const r = tasks[Math.floor(Math.random() * tasks.length)];
+            const r = tasks[Math.floor(Math.random()*tasks.length)];
             document.getElementById('task-display').innerText = r.t;
-            timeLeft = r.d * 60; isPaused = false; startTimer();
-        }
-        function startTimer() {
+            timeLeft = r.d * 60;
             timerId = setInterval(() => {
-                if(!isPaused && timeLeft > 0) {
-                    timeLeft--;
-                    let m = Math.floor(timeLeft/60), s = timeLeft%60;
-                    document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-                }
+                if(timeLeft > 0) { timeLeft--; updateDisplay(); }
             }, 1000);
         }
-        function togglePause() { isPaused = !isPaused; document.getElementById('pause-btn').innerText = isPaused ? "DEVAM ET" : "DURDUR"; }
-        function changeSong() { audio.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"; audio.load(); audio.play(); }
+
+        function updateDisplay() {
+            let m=Math.floor(timeLeft/60), s=timeLeft%60;
+            document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+        }
+
+        const emojis = ['🍎','🍎','🚀','🚀','💎','💎','🧠','🧠','⭐','⭐','🔥','🔥','👾','👾','🍀','🍀'];
+        let flippedCards = [];
+
+        function resetGame() {
+            const board = document.getElementById('game-board');
+            board.innerHTML = ''; flippedCards = [];
+            const shuffled = emojis.sort(() => 0.5 - Math.random());
+            shuffled.forEach(emoji => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.value = emoji;
+                card.onclick = () => {
+                    if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                        card.classList.add('flipped'); card.innerText = emoji;
+                        flippedCards.push(card);
+                        if (flippedCards.length === 2) setTimeout(checkMatch, 600);
+                    }
+                };
+                board.appendChild(card);
+            });
+        }
+
+        function checkMatch() {
+            const [c1, c2] = flippedCards;
+            if (c1.dataset.value === c2.dataset.value) { c1.classList.add('matched'); c2.classList.add('matched'); }
+            else { c1.classList.remove('flipped'); c2.classList.remove('flipped'); c1.innerText = ''; c2.innerText = ''; }
+            flippedCards = [];
+        }
     </script>
 </body>
 </html>
