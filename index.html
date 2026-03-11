@@ -13,18 +13,13 @@
             background-size: cover; background-position: center;
         }
         .panel { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: center; }
-        
-        /* HAREZMİ BAŞLIĞI - MAVİ VE BÜYÜK */
-        .brand-header {
-            font-size: 3rem; font-weight: 900; color: #00f2ff; 
-            text-shadow: 0 0 20px rgba(0, 242, 255, 0.5); margin-bottom: 10px;
-            letter-spacing: 4px;
-        }
-
-        /* DERS PANELİ */
+        .brand-header { font-size: 3rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px rgba(0, 242, 255, 0.5); margin-bottom: 10px; letter-spacing: 4px; }
         #timer-display { font-size: 5.5rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
-        .btn-main { background: #ff0000; color: white; border: none; padding: 18px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; }
-
+        
+        /* BUTONLAR */
+        .btn-main { background: #ff0000; color: white; border: none; padding: 18px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .btn-control { background: rgba(255,255,255,0.1); color: white; border: 1px solid #444; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; margin: 5px; }
+        
         /* OYUN PANELİ */
         #fun-panel { background: linear-gradient(135deg, #0a0a0a 0%, #001f3f 100%); }
         .memory-game { display: grid; grid-template-columns: repeat(4, 65px); grid-gap: 10px; justify-content: center; margin: 15px 0; }
@@ -32,8 +27,7 @@
         .card.flipped { background: #fff; color: #000; }
         .card.matched { visibility: hidden; }
 
-        /* MÜZİK VE NAVİGASYON */
-        .music-control { margin-top: 25px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.2); }
+        .music-control { margin-top: 25px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.2); }
         .nav-btn { position: fixed; bottom: 20px; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 100; }
     </style>
 </head>
@@ -41,13 +35,18 @@
 
     <div id="work-panel" class="panel" style="display:flex;">
         <div class="brand-header">HAREZMİ</div>
-        <div id="task-display" style="font-size: 1.2rem; color: #ccc; margin-bottom: 5px;">HAZIRSAN BAŞLAYALIM!</div>
+        <div id="task-display" style="font-size: 1.2rem; color: #ccc;">DERS MODU</div>
         <div id="timer-display">00:00</div>
+        
         <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button>
+        <div>
+            <button class="btn-control" id="pause-btn" onclick="togglePause()">SÜREYİ DURDUR</button>
+        </div>
         
         <div class="music-control">
-            <p id="song-name" style="font-size: 0.8rem; margin-bottom: 5px; color: #00f2ff;">🎵 Dinlendirici Müzik</p>
-            <button onclick="changeSong()" style="background:none; border:1px solid #00f2ff; color:#00f2ff; padding:5px 12px; border-radius:10px; font-size:0.7rem; cursor:pointer;">ŞARKI DEĞİŞTİR</button>
+            <p id="song-name" style="font-size: 0.8rem; margin-bottom: 8px; color: #00f2ff;">🎵 Çalıyor...</p>
+            <button onclick="changeSong()" class="btn-control" style="border-color:#00f2ff; color:#00f2ff;">DEĞİŞTİR</button>
+            <button onclick="stopMusic()" class="btn-control" style="border-color:#ff4444; color:#ff4444;">MÜZİĞİ KAPAT</button>
         </div>
 
         <button class="nav-btn" onclick="showPanel('fun-panel')" style="right: 20px; background: #00f2ff; color: #000;">OYUN MODU ➔</button>
@@ -56,36 +55,37 @@
     <div id="fun-panel" class="panel">
         <div class="brand-header" style="font-size: 2rem;">HAREZMİ OYUN</div>
         <div class="memory-game" id="game-board"></div>
-        <button onclick="resetGame()" style="background:none; border:1px solid #00f2ff; color:#00f2ff; padding:8px 20px; border-radius:10px; cursor:pointer;">YENİDEN BAŞLAT</button>
-        
+        <button onclick="resetGame()" class="btn-control">YENİDEN BAŞLAT</button>
         <button class="nav-btn" onclick="showPanel('work-panel')" style="left: 20px; background: #ff4444; color: #fff;">⬅ DERS MODU</button>
     </div>
 
     <audio id="bg-audio" loop><source id="audio-src" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"></audio>
 
     <script>
-        const tasks = [
-            {t:"20 Matematik Sorusu", d:25}, {t:"Fen Bilgisi Çalış", d:15}, 
-            {t:"15 Sayfa Kitap Oku", d:20}, {t:"İngilizce Tekrar", d:12}
-        ];
+        const tasks = [{t:"20 Matematik Sorusu", d:25}, {t:"Fen Bilgisi Çalış", d:15}, {t:"15 Sayfa Kitap Oku", d:20}];
         const playlist = [
             {n: "Yağmur Sesi", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
-            {n: "Sakin Piyano", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"},
-            {n: "Orman Sesleri", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3"}
+            {n: "Sakin Piyano", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"}
         ];
 
-        let timeLeft = 0, timerId = null, songIndex = 0;
+        let timeLeft = 0, timerId = null, isPaused = false, songIndex = 0;
         const audio = document.getElementById('bg-audio');
 
-        function initApp() {
-            window.onclick = () => { audio.play(); window.onclick = null; };
-        }
+        function initApp() { window.onclick = () => { audio.play(); document.getElementById('song-name').innerText = "🎵 " + playlist[0].n; window.onclick = null; }; }
         
         function showPanel(id) { 
             document.querySelectorAll('.panel').forEach(p => p.style.display = 'none'); 
             document.getElementById(id).style.display = 'flex';
             if(id === 'fun-panel') resetGame();
         }
+
+        function togglePause() {
+            if(!timerId) return;
+            isPaused = !isPaused;
+            document.getElementById('pause-btn').innerText = isPaused ? "DEVAM ET" : "SÜREYİ DURDUR";
+        }
+
+        function stopMusic() { audio.pause(); document.getElementById('song-name').innerText = "🔇 Müzik Kapalı"; }
 
         function changeSong() {
             songIndex = (songIndex + 1) % playlist.length;
@@ -98,9 +98,10 @@
             if(timerId) clearInterval(timerId);
             const r = tasks[Math.floor(Math.random()*tasks.length)];
             document.getElementById('task-display').innerText = r.t;
-            timeLeft = r.d * 60;
+            timeLeft = r.d * 60; isPaused = false;
+            document.getElementById('pause-btn').innerText = "SÜREYİ DURDUR";
             timerId = setInterval(() => {
-                if(timeLeft > 0) { timeLeft--; updateDisplay(); }
+                if(!isPaused && timeLeft > 0) { timeLeft--; updateDisplay(); }
             }, 1000);
         }
 
@@ -109,9 +110,9 @@
             document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
         }
 
+        // HAFIZA OYUNU AYNI KALIYOR
         const emojis = ['🍎','🍎','🚀','🚀','💎','💎','🧠','🧠','⭐','⭐','🔥','🔥','👾','👾','🍀','🍀'];
         let flippedCards = [];
-
         function resetGame() {
             const board = document.getElementById('game-board');
             board.innerHTML = ''; flippedCards = [];
@@ -130,7 +131,6 @@
                 board.appendChild(card);
             });
         }
-
         function checkMatch() {
             const [c1, c2] = flippedCards;
             if (c1.dataset.value === c2.dataset.value) { c1.classList.add('matched'); c2.classList.add('matched'); }
