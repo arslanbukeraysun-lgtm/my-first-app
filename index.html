@@ -1,3 +1,4 @@
+cat << 'EOF' > index.html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -9,7 +10,6 @@
             margin: 0; padding: 0; background-color: #000; color: white;
             font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden;
             display: flex; align-items: center; justify-content: center; text-align: center;
-            /* ARKA PLAN AYARI */
             background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://harezmi-snowy.vercel.app/bg.jpg');
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
@@ -18,25 +18,21 @@
         #timer-display { font-size: 5rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
         .btn-main { background: #ff0000; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; }
         .btn-control { background: rgba(255,255,255,0.1); color: white; border: 1px solid #444; padding: 8px 18px; border-radius: 20px; cursor: pointer; margin: 5px; }
-        
         .memory-game { display: grid; grid-template-columns: repeat(4, 60px); grid-gap: 8px; justify-content: center; margin: 15px 0; }
         .card { width: 60px; height: 60px; background: rgba(0, 242, 255, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border: 1px solid #00f2ff; }
         .card.flipped { background: #fff; color: #000; }
         .card.matched { visibility: hidden; }
-
         .music-control { margin-top: 15px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid #00f2ff; }
         .nav-btn { position: fixed; bottom: 20px; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 100; }
     </style>
 </head>
 <body onload="initApp()">
-
     <div id="work-panel" class="panel" style="display:flex;">
         <div class="brand-header">HAREZMİ</div>
         <div id="task-display" style="font-size: 1.2rem; color: #ccc;">BAŞLAMAYA HAZIR MISIN?</div>
         <div id="timer-display">00:00</div>
         <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button>
         <button class="btn-control" id="pause-btn" onclick="togglePause()">DURDUR/DEVAM ET</button>
-        
         <div class="music-control">
             <p id="song-name" style="font-size: 0.9rem; color: #00f2ff;">🎵 Müzik Hazır</p>
             <button onclick="changeSong()" class="btn-control" style="border-color:#00f2ff;">DEĞİŞTİR</button>
@@ -44,86 +40,34 @@
         </div>
         <button class="nav-btn" onclick="showPanel('fun-panel')" style="right: 20px; background: #00f2ff;">OYUN ➔</button>
     </div>
-
     <div id="fun-panel" class="panel">
         <div class="brand-header" style="font-size: 2rem;">HAREZMİ OYUN</div>
         <div class="memory-game" id="game-board"></div>
         <button onclick="resetGame()" class="btn-control">SIFIRLA</button>
         <button class="nav-btn" onclick="showPanel('work-panel')" style="left: 20px; background: #ff4444;">⬅ GERİ</button>
     </div>
-
     <audio id="bg-audio" loop></audio>
-
     <script>
         const tasks = [{t:"Matematik Çalış", d:25}, {t:"Kitap Oku", d:20}, {t:"Kelime Ezberle", d:15}];
-        
-        // GÜNCELLENMİŞ ÇALIŞAN MÜZİK LİNKLERİ
-        const playlist = [
-            {n: "Piyano Sesi", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
-            {n: "Yağmur & Odak", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
-            {n: "Sakin Ritim", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
-            {n: "Derin Konsantrasyon", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"}
-        ];
-
+        const playlist = [{n:"Piyano", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},{n:"Yagmur", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"}];
         let timeLeft = 0, timerId = null, isPaused = false, songIndex = 0;
         const audio = document.getElementById('bg-audio');
-
-        function initApp() {
-            window.onclick = () => { 
-                if(!audio.src) {
-                    audio.src = playlist[0].s;
-                    document.getElementById('song-name').innerText = "🎵 " + playlist[0].n;
-                }
-                audio.play().catch(e => console.log("Müzik hatası:", e)); 
-                window.onclick = null; 
-            };
-        }
-        
-        function changeSong() {
-            songIndex = (songIndex + 1) % playlist.length;
-            document.getElementById('song-name').innerText = "🎵 " + playlist[songIndex].n;
-            audio.src = playlist[songIndex].s;
-            audio.play();
-        }
-
+        function initApp() { window.onclick = () => { if(!audio.src) { audio.src = playlist[0].s; document.getElementById('song-name').innerText = "🎵 " + playlist[0].n; } audio.play(); window.onclick = null; }; }
+        function changeSong() { songIndex = (songIndex + 1) % playlist.length; document.getElementById('song-name').innerText = "🎵 " + playlist[songIndex].n; audio.src = playlist[songIndex].s; audio.play(); }
         function stopMusic() { audio.pause(); document.getElementById('song-name').innerText = "🔇 Kapalı"; }
         function showPanel(id) { document.querySelectorAll('.panel').forEach(p=>p.style.display='none'); document.getElementById(id).style.display='flex'; if(id==='fun-panel') resetGame(); }
         function togglePause() { if(timerId) isPaused = !isPaused; }
-        
-        function generateTask() {
-            if(timerId) clearInterval(timerId);
-            const r = tasks[Math.floor(Math.random()*tasks.length)];
-            document.getElementById('task-display').innerText = r.t;
-            timeLeft = r.d * 60; isPaused = false;
-            timerId = setInterval(() => { if(!isPaused && timeLeft > 0) { timeLeft--; updateDisplay(); } }, 1000);
-        }
+        function generateTask() { if(timerId) clearInterval(timerId); const r = tasks[Math.floor(Math.random()*tasks.length)]; document.getElementById('task-display').innerText = r.t; timeLeft = r.d * 60; isPaused = false; timerId = setInterval(() => { if(!isPaused && timeLeft > 0) { timeLeft--; updateDisplay(); } }, 1000); }
         function updateDisplay() { let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`; }
-
         const emojis = ['🍎','🍎','🚀','🚀','💎','💎','🧠','🧠','⭐','⭐','🔥','🔥','👾','👾','🍀','🍀','🛸','🛸','🌈','🌈','🍦','🍦','🎸','🎸'];
         let flippedCards = [];
-        function resetGame() {
-            const board = document.getElementById('game-board');
-            board.innerHTML = ''; flippedCards = [];
-            const shuffled = emojis.sort(() => 0.5 - Math.random());
-            shuffled.forEach(emoji => {
-                const card = document.createElement('div');
-                card.classList.add('card'); card.dataset.value = emoji;
-                card.onclick = () => {
-                    if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
-                        card.classList.add('flipped'); card.innerText = emoji; flippedCards.push(card);
-                        if (flippedCards.length === 2) setTimeout(checkMatch, 600);
-                    }
-                };
-                board.appendChild(card);
-            });
-        }
-        function checkMatch() {
-            const [c1, c2] = flippedCards;
-            if (c1.dataset.value === c2.dataset.value) { c1.classList.add('matched'); c2.classList.add('matched'); }
-            else { c1.classList.remove('flipped'); c2.classList.remove('flipped'); c1.innerText = ''; c2.innerText = ''; }
-            flippedCards = [];
-        }
+        function resetGame() { const board = document.getElementById('game-board'); board.innerHTML = ''; flippedCards = []; const shuffled = emojis.sort(() => 0.5 - Math.random()); shuffled.forEach(emoji => { const card = document.createElement('div'); card.classList.add('card'); card.dataset.value = emoji; card.onclick = () => { if (flippedCards.length < 2 && !card.classList.contains('flipped')) { card.classList.add('flipped'); card.innerText = emoji; flippedCards.push(card); if (flippedCards.length === 2) setTimeout(checkMatch, 600); } }; board.appendChild(card); }); }
+        function checkMatch() { const [c1, c2] = flippedCards; if (c1.dataset.value === c2.dataset.value) { c1.classList.add('matched'); c2.classList.add('matched'); } else { c1.classList.remove('flipped'); c2.classList.remove('flipped'); c1.innerText = ''; c2.innerText = ''; } flippedCards = []; }
     </script>
 </body>
 </html>
+EOF
+git add .
+git commit -m "Kesin Final"
+git push origin main --force
 
