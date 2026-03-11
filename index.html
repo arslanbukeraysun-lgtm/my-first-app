@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULTRATHINK</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            /* ARKA PLAN FOTOĞRAFI VE KARARTMA */
+            background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('1773236290759.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* GİRİŞ EKRANI */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        #splash-screen h1 {
+            font-size: 3.5rem;
+            color: #ff0000;
+            letter-spacing: 5px;
+            text-shadow: 0 0 30px rgba(255,0,0,0.6);
+            margin: 0;
+        }
+
+        #main-ui { display: none; width: 100%; padding: 20px; box-sizing: border-box; }
+
+        #task-display {
+            font-size: 1.4rem;
+            min-height: 70px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #38bdf8;
+            text-shadow: 1px 1px 5px black;
+        }
+
+        #timer-display {
+            font-size: 5.5rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* KIRMIZI ANA BUTON */
+        .btn-main {
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255,0,0,0.5);
+            margin: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-main:active { transform: scale(0.95); }
+
+        /* DURDURMA BUTONU */
+        .btn-stop {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 12px 25px;
+            font-size: 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        /* MÜZİK PANELİ */
+        .music-panel {
+            margin-top: 40px;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-music {
+            background: none;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            padding: 6px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen" onclick="startApp()">
+        <h1>ULTRATHINK</h1>
+        <p style="letter-spacing: 2px; margin-top: 20px;">DOKUN VE BAŞLA</p>
+    </div>
+
+    <div id="main-ui">
+        <div id="task-display">HAZIR MISIN?</div>
+        <div id="timer-display">00:00</div>
+
+        <div>
+            <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button><br>
+            <button class="btn-stop" id="pause-btn" onclick="togglePause()">DURDUR</button>
+        </div>
+
+        <div class="music-panel">
+            <p id="current-song" style="font-size: 0.9rem; margin-bottom: 10px;">🎵 Klasik Müzik</p>
+            <button class="btn-music" onclick="changeSong()">ŞARKI DEĞİŞTİR</button>
+        </div>
+    </div>
+
+    <audio id="bg-audio" loop>
+        <source id="audio-src" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // 50 GÖREV LİSTESİ (EĞİTİM & SORU ODAKLI)
+        const tasks = [
+            {t: "20 Matematik Sorusu Çöz", d: 25},
+            {t: "Fen Bilgisi Özetini Oku", d: 15},
+            {t: "İngilizce 10 Yeni Kelime Yaz", d: 12},
+            {t: "15 Sayfa Kitap Oku", d: 20},
+            {t: "Sosyal Bilgiler Testi Çöz", d: 15},
+            {t: "Matematik Formüllerini Tekrarla", d: 10},
+            {t: "Edebiyat Notlarına Göz At", d: 15},
+            {t: "Din Kültürü Soruları Çöz", d: 10},
+            {t: "5 Dakika Gözlerini Kapat Dinlen", d: 5},
+            {t: "Odanı Topla ve Havalandır", d: 8},
+            {t: "Su İç ve Kısa Bir Yürüyüş Yap", d: 5},
+            {t: "Atatürk'ün Bir Sözünü Oku", d: 2},
+            {t: "10 Şınav + 10 Mekik Çek", d: 4},
+            {t: "Bugünkü Hatalarını Gözden Geçir", d: 10},
+            {t: "Haftalık Planını Kontrol Et", d: 5},
+            {t: "Resim Çiz veya Bir Şey Tasarla", d: 15},
+            {t: "Masanı Sil ve Düzenle", d: 5},
+            {t: "Gelecek Haftanın Konusuna Bak", d: 10}
+            // Not: Buraya daha fazla görev ekleyebilirsin.
+        ];
+
+        const playlist = [
+            {n: "Klasik Müzik - Mozart", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+            {n: "Lofi Focus Beats", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
+            {n: "Doğa ve Yağmur Sesleri", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"}
+        ];
+
+        let timeLeft = 0;
+        let timerId = null;
+        let isPaused = false;
+        let songIndex = 0;
+        const audio = document.getElementById('bg-audio');
+
+        function startApp() {
+            document.getElementById('splash-screen').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'block';
+            audio.play();
+        }
+
+        function generateTask() {
+            if(timerId) clearInterval(timerId);
+            const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
+            document.getElementById('task-display').innerText = randomTask.t;
+            timeLeft = randomTask.d * 60;
+            isPaused = false;
+            document.getElementById('pause-btn').innerText = "DURDUR";
+            updateTimer();
+            startTimer();
+        }
+
+        function startTimer() {
+            timerId = setInterval(() => {
+                if(!isPaused && timeLeft > 0) {
+                    timeLeft--;
+                    updateTimer();
+                } else if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                }
+            }, 1000);
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            document.getElementById('pause-btn').innerText = isPaused ? "DEVAM ET" : "DURDUR";
+        }
+
+        function updateTimer() {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = 
+                `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        }
+
+        function changeSong() {
+            songIndex = (songIndex + 1) % playlist.length;
+            document.getElementById('current-song').innerText = "🎵 " + playlist[songIndex].n;
+            document.getElementById('audio-src').src = playlist[songIndex].s;
+            audio.load();
+            audio.play();
+        }
+    </script>
+</body>
+</html>
+
