@@ -3,31 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAREZMİ ÇALIŞMA PANELİ</title>
+    <title>HAREZMİ PANEL</title>
     <style>
         body {
             margin: 0; padding: 0; background-color: #000; color: white;
             font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden;
             display: flex; align-items: center; justify-content: center; text-align: center;
-            /* ARKA PLAN FOTOĞRAFI */
-            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('screenshots.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            /* ARKA PLAN AYARI */
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('screenshots.jpg');
+            background-size: cover; background-position: center; background-repeat: no-repeat;
         }
         .panel { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: center; }
-        .brand-header { font-size: 3.5rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px rgba(0, 242, 255, 0.5); margin-bottom: 5px; letter-spacing: 5px; }
-        #timer-display { font-size: 5rem; font-weight: bold; color: #ff4444; margin: 5px 0; font-family: 'Courier New', monospace; }
+        .brand-header { font-size: 3.5rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px rgba(0, 242, 255, 0.6); margin-bottom: 5px; }
+        #timer-display { font-size: 5rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
+        .btn-main { background: #ff0000; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; }
+        .btn-control { background: rgba(255,255,255,0.1); color: white; border: 1px solid #444; padding: 8px 18px; border-radius: 20px; cursor: pointer; margin: 5px; }
         
-        .btn-main { background: #ff0000; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(255,0,0,0.4); }
-        .btn-control { background: rgba(255,255,255,0.1); color: white; border: 1px solid #444; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; margin: 3px; }
-        
-        /* ÇOĞALTILMIŞ OYUN PANELİ (24 KART) */
-        #fun-panel { background: linear-gradient(135deg, #050505 0%, #001a33 100%); }
-        .memory-game { display: grid; grid-template-columns: repeat(4, 60px); grid-gap: 8px; justify-content: center; margin: 10px 0; }
+        .memory-game { display: grid; grid-template-columns: repeat(4, 60px); grid-gap: 8px; justify-content: center; margin: 15px 0; }
         .card { width: 60px; height: 60px; background: rgba(0, 242, 255, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border: 1px solid #00f2ff; }
         .card.flipped { background: #fff; color: #000; }
         .card.matched { visibility: hidden; }
 
-        .music-control { margin-top: 15px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.2); }
+        .music-control { margin-top: 15px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid #00f2ff; }
         .nav-btn { position: fixed; bottom: 20px; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 100; }
     </style>
 </head>
@@ -35,44 +32,37 @@
 
     <div id="work-panel" class="panel" style="display:flex;">
         <div class="brand-header">HAREZMİ</div>
-        <div id="task-display" style="font-size: 1.1rem; color: #ccc;">ODAKLANMA MODU</div>
+        <div id="task-display" style="font-size: 1.2rem; color: #ccc;">BAŞLAMAYA HAZIR MISIN?</div>
         <div id="timer-display">00:00</div>
-        
         <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button>
         <button class="btn-control" id="pause-btn" onclick="togglePause()">DURDUR/DEVAM ET</button>
         
         <div class="music-control">
-            <p id="song-name" style="font-size: 0.8rem; margin-bottom: 5px; color: #00f2ff;">🎵 Müzik Hazır</p>
-            <button onclick="changeSong()" class="btn-control" style="border-color:#00f2ff; color:#00f2ff;">SONRAKİ ŞARKI</button>
-            <button onclick="stopMusic()" class="btn-control" style="border-color:#ff4444; color:#ff4444;">MÜZİĞİ KAPAT</button>
+            <p id="song-name" style="font-size: 0.9rem; color: #00f2ff;">🎵 Müzik Hazır</p>
+            <button onclick="changeSong()" class="btn-control" style="border-color:#00f2ff;">DEĞİŞTİR</button>
+            <button onclick="stopMusic()" class="btn-control" style="border-color:#ff4444;">KAPAT</button>
         </div>
-
-        <button class="nav-btn" onclick="showPanel('fun-panel')" style="right: 20px; background: #00f2ff; color: #000;">HAFIZA OYUNU ➔</button>
+        <button class="nav-btn" onclick="showPanel('fun-panel')" style="right: 20px; background: #00f2ff;">OYUN ➔</button>
     </div>
 
     <div id="fun-panel" class="panel">
         <div class="brand-header" style="font-size: 2rem;">HAREZMİ OYUN</div>
         <div class="memory-game" id="game-board"></div>
-        <button onclick="resetGame()" class="btn-control" style="border-color:#00f2ff; color:#00f2ff;">OYUNU SIFIRLA</button>
-        <button class="nav-btn" onclick="showPanel('work-panel')" style="left: 20px; background: #ff4444; color: #fff;">⬅ GERİ DÖN</button>
+        <button onclick="resetGame()" class="btn-control">SIFIRLA</button>
+        <button class="nav-btn" onclick="showPanel('work-panel')" style="left: 20px; background: #ff4444;">⬅ GERİ</button>
     </div>
 
-    <audio id="bg-audio" loop><source id="audio-src" src=""></audio>
+    <audio id="bg-audio" loop></audio>
 
     <script>
-        const tasks = [
-            {t:"20 Matematik Sorusu", d:25}, {t:"Fen Bilgisi Çalış", d:15}, 
-            {t:"15 Sayfa Kitap Oku", d:20}, {t:"İngilizce Kelime Yaz", d:12},
-            {t:"Sosyal Bilgiler Tekrar", d:15}, {t:"Zayıf Konuyu Bitir", d:30}
-        ];
-
-        // ÇOĞALTILMIŞ MÜZİKLER
+        const tasks = [{t:"Matematik Çalış", d:25}, {t:"Kitap Oku", d:20}, {t:"Kelime Ezberle", d:15}];
+        
+        // GÜNCELLENMİŞ ÇALIŞAN MÜZİK LİNKLERİ
         const playlist = [
-            {n: "Huzurlu Yağmur", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
-            {n: "Sakin Piyano", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"},
-            {n: "Doğa ve Kuşlar", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3"},
-            {n: "Odaklanma Dalgaları", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
-            {n: "Gece Melodisi", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"}
+            {n: "Piyano Sesi", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+            {n: "Yağmur & Odak", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
+            {n: "Sakin Ritim", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
+            {n: "Derin Konsantrasyon", s: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"}
         ];
 
         let timeLeft = 0, timerId = null, isPaused = false, songIndex = 0;
@@ -84,43 +74,31 @@
                     audio.src = playlist[0].s;
                     document.getElementById('song-name').innerText = "🎵 " + playlist[0].n;
                 }
-                audio.play(); 
+                audio.play().catch(e => console.log("Müzik hatası:", e)); 
                 window.onclick = null; 
             };
         }
         
-        function showPanel(id) { 
-            document.querySelectorAll('.panel').forEach(p => p.style.display = 'none'); 
-            document.getElementById(id).style.display = 'flex';
-            if(id === 'fun-panel') resetGame();
-        }
-
-        function togglePause() { if(timerId) isPaused = !isPaused; }
-        function stopMusic() { audio.pause(); document.getElementById('song-name').innerText = "🔇 Müzik Kapalı"; }
-
         function changeSong() {
             songIndex = (songIndex + 1) % playlist.length;
             document.getElementById('song-name').innerText = "🎵 " + playlist[songIndex].n;
-            document.getElementById('audio-src').src = playlist[songIndex].s;
-            audio.load(); audio.play();
+            audio.src = playlist[songIndex].s;
+            audio.play();
         }
 
+        function stopMusic() { audio.pause(); document.getElementById('song-name').innerText = "🔇 Kapalı"; }
+        function showPanel(id) { document.querySelectorAll('.panel').forEach(p=>p.style.display='none'); document.getElementById(id).style.display='flex'; if(id==='fun-panel') resetGame(); }
+        function togglePause() { if(timerId) isPaused = !isPaused; }
+        
         function generateTask() {
             if(timerId) clearInterval(timerId);
             const r = tasks[Math.floor(Math.random()*tasks.length)];
             document.getElementById('task-display').innerText = r.t;
             timeLeft = r.d * 60; isPaused = false;
-            timerId = setInterval(() => {
-                if(!isPaused && timeLeft > 0) { timeLeft--; updateDisplay(); }
-            }, 1000);
+            timerId = setInterval(() => { if(!isPaused && timeLeft > 0) { timeLeft--; updateDisplay(); } }, 1000);
         }
+        function updateDisplay() { let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`; }
 
-        function updateDisplay() {
-            let m=Math.floor(timeLeft/60), s=timeLeft%60;
-            document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-        }
-
-        // ÇOĞALTILMIŞ HAFIZA OYUNU (24 KART)
         const emojis = ['🍎','🍎','🚀','🚀','💎','💎','🧠','🧠','⭐','⭐','🔥','🔥','👾','👾','🍀','🍀','🛸','🛸','🌈','🌈','🍦','🍦','🎸','🎸'];
         let flippedCards = [];
         function resetGame() {
@@ -129,12 +107,10 @@
             const shuffled = emojis.sort(() => 0.5 - Math.random());
             shuffled.forEach(emoji => {
                 const card = document.createElement('div');
-                card.classList.add('card');
-                card.dataset.value = emoji;
+                card.classList.add('card'); card.dataset.value = emoji;
                 card.onclick = () => {
                     if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
-                        card.classList.add('flipped'); card.innerText = emoji;
-                        flippedCards.push(card);
+                        card.classList.add('flipped'); card.innerText = emoji; flippedCards.push(card);
                         if (flippedCards.length === 2) setTimeout(checkMatch, 600);
                     }
                 };
