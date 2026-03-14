@@ -4,63 +4,117 @@ cat << 'EOF' > index.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAREZMİ</title>
+    <title>HAREZMİ - ODAK PANELİ</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
         .bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./bg.jpg');
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('./bg.jpg');
             background-size: cover; background-position: center; z-index: 1;
         }
-        .ui {
+        .container {
             position: relative; z-index: 10; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .panel {
-            background: rgba(0, 0, 0, 0.75); border: 2px solid #00f2ff;
-            padding: 40px 20px; border-radius: 40px; text-align: center;
-            width: 85%; max-width: 400px; backdrop-filter: blur(15px);
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.4);
+            background: rgba(0, 0, 0, 0.8); border: 2px solid #00f2ff;
+            padding: 35px 25px; border-radius: 40px; text-align: center;
+            width: 90%; max-width: 450px; backdrop-filter: blur(15px);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3);
         }
-        h1 { font-size: 3.5rem; color: #00f2ff; text-shadow: 0 0 20px #00f2ff; margin-bottom: 5px; }
-        #t-text { font-size: 1.1rem; color: #fff; margin: 15px 0; min-height: 2rem; text-transform: uppercase; }
-        #timer { font-size: 6rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
-        .btn-main { background: #ff0000; color: #fff; border: none; padding: 18px 45px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2rem; margin: 15px 0; }
-        .m-zone { margin-top: 25px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 20px; }
-        .btn-m { background: transparent; color: #fff; border: 1px solid #00f2ff; padding: 10px 25px; border-radius: 20px; margin: 5px; cursor: pointer; }
+        h1 { font-size: 3.5rem; color: #00f2ff; text-shadow: 0 0 20px #00f2ff; margin-bottom: 10px; }
+        #task-box { font-size: 1.2rem; color: #fff; margin: 20px 0; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; line-height: 1.4; font-weight: 500; }
+        #timer { font-size: 6rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; text-shadow: 0 0 15px rgba(255,0,0,0.3); }
+        .btn-main { background: #ff0000; color: #fff; border: none; padding: 20px 45px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.3rem; margin: 10px 0; transition: 0.3s; }
+        .btn-main:hover { transform: scale(1.05); background: #cc0000; }
+        .m-controls { margin-top: 25px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 20px; }
+        .btn-m { background: transparent; color: #fff; border: 1px solid #00f2ff; padding: 10px 20px; border-radius: 20px; margin: 5px; cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
-<body onload="init()">
+<body onload="initApp()">
     <div class="bg"></div>
-    <div class="ui">
+    <div class="container">
         <div class="panel">
             <h1>HAREZMİ</h1>
-            <p id="t-text">HAZIR MISIN?</p>
+            <div id="task-box">ODAKLANMAYA HAZIR MISIN?</div>
             <div id="timer">00:00</div>
-            <button class="btn-main" onclick="task()">YENİ GÖREV AL</button>
-            <div class="m-zone">
-                <p id="m-info" style="color:#00f2ff; margin-bottom:10px;">🎵 Müzik Hazır (Dokun)</p>
-                <button onclick="next()" class="btn-m">DEĞİŞTİR</button>
-                <button onclick="stop()" class="btn-m" style="border-color:#ff4444;">KAPAT</button>
+            <button class="btn-main" onclick="startNewTask()">YENİ GÖREV AL</button>
+            <div class="m-controls">
+                <p id="m-label" style="color:#00f2ff; margin-bottom:12px; font-weight:bold;">🎵 Müzik: Hazır</p>
+                <button onclick="changeM()" class="btn-m">DEĞİŞTİR</button>
+                <button onclick="muteM()" class="btn-m" style="border-color:#ff4444;">DURDUR</button>
             </div>
         </div>
     </div>
     <audio id="player" loop></audio>
     <script>
-        const tasks = ["Matematik Çöz", "Kitap Oku", "Kod Yaz", "Spor Yap", "Resim Çiz"];
-        const songs = [{n:"Lofi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"}, {n:"Deep", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"}];
-        let sec = 0, tid = null, sidx = 0;
+        const taskList = [
+            "Matematik: 15 Problem Çöz", "Kitap: 20 Sayfa Oku", "Yazılım: Yeni Fonksiyon Yaz", "İngilizce: 10 Kelime Ezberle",
+            "Tarih: Bir Konu Özeti Çıkar", "Spor: 20 Şınav Çek", "Meditasyon: 5 Dakika Gözlerini Kapat", "Su İç: Büyük Bir Bardak",
+            "Yazılım: CSS Flexbox Tekrar Et", "Geometri: Üçgen Sorusu Çöz", "Edebiyat: Bir Şiir İncele", "Müzik: Enstrümantal Dinle",
+            "Fizik: Formüllere Göz At", "Kimya: Elementleri Tekrar Et", "Biyoloji: Hücre Çizimi Yap", "Coğrafya: Haritaya Bak",
+            "Harezmi: Algoritma Araştır", "Mantık: Bir Bilmece Çöz", "Planlama: Yarını Listele", "Düzen: Masanı Toparla",
+            "Yazılım: HTML Form Etiketleri", "Kelime: Tersten Okuma Yap", "Hız: 1 Dakika Yazı Yaz", "Resim: Bir Karalama Yap",
+            "Teknoloji: Yapay Zeka Haberi Oku", "İngilizce: Kısa Çeviri Yap", "Genel Kültür: Başkent Ezberle", "Odak: Telefonu Uzaklaştır",
+            "Matematik: Çarpım Tablosu Pratiği", "Türkçe: Yazım Kuralları Bak", "Fizik: Newton Yasaları Oku", "Kimya: Deney İzle",
+            "Analiz: Hatalarını Gözden Geçir", "GitHub: Profilini Güncelle", "E-posta: Kutunu Temizle", "Sözlük: Rastgele Kelime",
+            "Motivasyon: Hedefini Yaz", "İngilizce: Sesli Okuma", "Podcast: Gelişim Dinle", "Yazılım: Vercel Ayarları",
+            "Matematik: Karekök Çalış", "Biyoloji: Bitki Yapısı Bak", "Edebiyat: Yazar Hayatı Oku", "Tarih: Padişahları Say",
+            "Mantık: Satranç Hamlesi Düşün", "Fizik: Elektrik Konusu", "Kimya: Periyodik Tablo Çiz", "Spor: 1 Dakika Plank",
+            "Yazılım: JavaScript Dizileri", "Yazılım: LocalStorage Nedir?", "Odak: Pencereden Dışarı Bak", "Resim: Geometrik Çizim",
+            "Matematik: Yüzde Hesapla", "İngilizce: Şarkı Çevir", "Türkçe: Paragraf Çöz", "Harezmi: Cebir Tarihi",
+            "Düzen: Çantanı Hazırla", "Yazılım: API Nedir?", "Bilim: Uzay Haberi Oku", "Kişisel Gelişim: Not Al"
+        ];
+
+        const playlist = [
+            {n:"Dinlendirici Piyano", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"},
+            {n:"Hafif Yağmur Sesi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
+            {n:"Derin Odaklanma", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
+            {n:"Sakin Doğa Sesi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+            {n:"Gece Esintisi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"}
+        ];
+
+        let timeLeft = 0, timerId = null, mIdx = 0;
         const p = document.getElementById('player');
-        function init() { window.onclick = () => { if(!p.src){ p.src=songs[0].s; document.getElementById('m-info').innerText="🎵 "+songs[0].n; } p.play(); window.onclick=null; }; }
-        function next(){ sidx=(sidx+1)%songs.length; p.src=songs[sidx].s; document.getElementById('m-info').innerText="🎵 "+songs[sidx].n; p.play(); }
-        function stop(){ p.pause(); document.getElementById('m-info').innerText="🔇 Kapalı"; }
-        function task(){ if(tid) clearInterval(tid); document.getElementById('t-text').innerText=tasks[Math.floor(Math.random()*tasks.length)]; sec=25*60; tid=setInterval(()=>{ if(sec>0){ sec--; let m=Math.floor(sec/60), s=sec%60; document.getElementById('timer').innerText=(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); } },1000); }
+
+        function initApp() {
+            window.onclick = () => {
+                if(!p.src){ p.src=playlist[0].s; document.getElementById('m-label').innerText="🎵 Müzik: "+playlist[0].n; }
+                p.play(); window.onclick=null;
+            };
+        }
+
+        function changeM(){
+            mIdx=(mIdx+1)%playlist.length;
+            p.src=playlist[mIdx].s;
+            document.getElementById('m-label').innerText="🎵 Müzik: "+playlist[mIdx].n;
+            p.play();
+        }
+
+        function muteM(){ p.pause(); document.getElementById('m-label').innerText="🔇 Kapalı"; }
+
+        function startNewTask(){
+            if(timerId) clearInterval(timerId);
+            const r = taskList[Math.floor(Math.random()*taskList.length)];
+            document.getElementById('task-box').innerText = r;
+            timeLeft = 25 * 60; // Her görevde 25 dakika
+            timerId = setInterval(() => {
+                if(timeLeft > 0){
+                    timeLeft--;
+                    let m=Math.floor(timeLeft/60), s=timeLeft%60;
+                    document.getElementById('timer').innerText=(m<10?'0'+m:m)+":"+(s<10?'0'+s:s);
+                } else {
+                    clearInterval(timerId);
+                    document.getElementById('task-box').innerText = "GÖREV TAMAMLANDI!";
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
 EOF
 git add .
-git commit -m "Tum yazilar temizlendi"
+git commit -m "Maksimum gorev ve Turkce muzik listesi"
 git push origin main --force
 
