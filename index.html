@@ -1,4 +1,3 @@
-
 cat << 'EOF' > index.html
 <!DOCTYPE html>
 <html lang="tr">
@@ -9,125 +8,80 @@ cat << 'EOF' > index.html
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
-        
-        .bg-layer {
+        .bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('./bg.jpg');
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./bg.jpg');
             background-size: cover; background-position: center; z-index: 1;
         }
-
-        .main-ui {
+        .main {
             position: relative; z-index: 10; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
-
         .panel {
-            background: rgba(0, 0, 0, 0.82); border: 2px solid #00f2ff;
-            padding: 35px 25px; border-radius: 45px; text-align: center;
+            background: rgba(0, 0, 0, 0.8); border: 2px solid #00f2ff;
+            padding: 35px 25px; border-radius: 40px; text-align: center;
             width: 88%; max-width: 440px; backdrop-filter: blur(15px);
-            box-shadow: 0 0 45px rgba(0, 242, 255, 0.35);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3);
         }
-
-        h1 { font-size: 3.5rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px #00f2ff; margin-bottom: 5px; }
-        #task-text { font-size: 1.25rem; color: #fff; margin: 15px 0; min-height: 3.5rem; display: flex; align-items: center; justify-content: center; font-weight: 600; text-transform: uppercase; }
-        #timer-display { font-size: 6rem; font-weight: bold; color: #ff4444; margin: 5px 0; font-family: monospace; }
-        
-        .btn-action { background: #ff0000; color: #fff; border: none; padding: 18px 45px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.25rem; margin-top: 15px; transition: 0.3s; }
-        .btn-action:active { transform: scale(0.95); }
-
-        .music-panel { margin-top: 25px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 20px; }
-        #song-title { color: #00f2ff; font-weight: bold; margin-bottom: 12px; font-size: 0.95rem; }
-        .btn-m { background: transparent; color: #fff; border: 1px solid #00f2ff; padding: 10px 22px; border-radius: 20px; margin: 5px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-        .btn-m:hover { background: rgba(0,242,255,0.1); }
+        h1 { font-size: 3.5rem; color: #00f2ff; text-shadow: 0 0 20px #00f2ff; margin-bottom: 10px; }
+        #task { font-size: 1.2rem; color: #fff; margin: 15px 0; min-height: 3.5rem; font-weight: 500; display: flex; align-items: center; justify-content: center; }
+        #timer { font-size: 6rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
+        .btn-main { background: #ff0000; color: #fff; border: none; padding: 18px 45px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2rem; margin: 10px 0; }
+        .m-box { margin-top: 25px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 20px; }
+        .btn-m { background: transparent; color: #fff; border: 1px solid #00f2ff; padding: 10px 20px; border-radius: 20px; margin: 5px; cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
-<body onload="initApp()">
-    <div class="bg-layer"></div>
-    <div class="main-ui">
+<body onload="init()">
+    <div class="bg"></div>
+    <div class="main">
         <div class="panel">
             <h1>HAREZMİ</h1>
-            <div id="task-text">BAŞLAMAK İÇİN BUTONA BAS</div>
-            <div id="timer-display">00:00</div>
-            <button class="btn-action" onclick="newTask()">YENİ GÖREV AL</button>
-            
-            <div class="music-panel">
-                <p id="song-title">🎵 Müzik: Bekleniyor...</p>
-                <button onclick="nextSong()" class="btn-m">DEĞİŞTİR</button>
-                <button onclick="stopSong()" class="btn-m" style="border-color:#ff4444;">DURDUR</button>
+            <div id="task">ODAKLANMAYA HAZIR MISIN?</div>
+            <div id="timer">00:00</div>
+            <button class="btn-main" onclick="start()">YENİ GÖREV AL</button>
+            <div class="m-box">
+                <p id="m-status" style="color:#00f2ff; margin-bottom:12px; font-weight:bold;">🎵 Müzik Hazır</p>
+                <button onclick="next()" class="btn-m">DEĞİŞTİR</button>
+                <button onclick="stop()" class="btn-m" style="border-color:#ff4444;">DURDUR</button>
             </div>
         </div>
     </div>
-    <audio id="audio-engine" loop></audio>
-
+    <audio id="player" loop></audio>
     <script>
-        const myTasks = [
-            "Matematik: 20 Problem Çöz", "Kitap: 15 Sayfa Oku", "Kod: Yeni Bir API Araştır", "İngilizce: 10 Kelime Ezberle",
-            "Tarih: Bir Olayı Özetle", "Fizik: Formülleri Tekrar Et", "Geometri: 5 Soru Çöz", "Biyoloji: Hücre Bak",
-            "Spor: 20 Şınav Çek", "Su İç: Büyük Bir Bardak", "Düzen: Çalışma Masanı Topla", "Harezmi: Hayatını Oku",
-            "Yazılım: GitHub Commit Yap", "Edebiyat: Bir Şiir Analiz Et", "Kimya: Elementlere Göz At",
-            "Mantık: Bir Zeka Sorusu Çöz", "Yazılım: CSS Grid Tekrar Et", "Resim: Bir Karalama Yap",
-            "Planlama: Yarını Listele", "İngilizce: Bir Metin Çevir", "Türkçe: Yazım Kuralları Bak",
-            "Felsefe: Bir Sözü Yorumla", "Coğrafya: Ülke Konumları Bak", "Teknoloji: Yapay Zeka Haberi",
-            "Yazılım: Vercel Deploy Kontrol", "Matematik: Çarpım Tablosu Hız", "Analiz: Eksiklerini Yaz",
-            "Motivasyon: Hedefine Odaklan", "Dinlenme: 5 Dakika Meditasyon", "Yazılım: JavaScript Diziler"
+        const tasks = [
+            "Matematik: 15 Soru Çöz", "Kitap: 20 Sayfa Oku", "Kodlama: Yeni Fonksiyon Yaz", "İngilizce: 15 Kelime Ezberle",
+            "Tarih: Bir Konu Özeti Çıkar", "Fizik: 5 Formül Ezberle", "Kimya: Elementleri Tekrar Et", "Biyoloji: Hücre Çizimi Yap",
+            "Edebiyat: Bir Şiir Oku", "Spor: 20 Şınav Çek", "Su İç: Büyük Bir Bardak", "Düzen: Masanı Toparla",
+            "Yazılım: GitHub Commit Yap", "E-posta: Kutunu Temizle", "Mantık: Bir Bilmece Çöz", "Harezmi: Algoritma Araştır",
+            "İngilizce: Kısa Bir Çeviri", "Türkçe: Yazım Kuralları", "Coğrafya: Ülke Bulmaca", "Yazılım: CSS Grid Bak",
+            "Fizik: Newton Yasaları", "Biyoloji: Bitki Yapısı", "Edebiyat: Yazar Hayatı", "Matematik: Karekök Çalış",
+            "Teknoloji: Yapay Zeka Haberi", "Analiz: Hatalarını Yaz", "Motivasyon: Hedefini Belirle", "Hız: 1 Dakika Yazı",
+            "Yazılım: Vercel Ayarları", "Matematik: Yüzde Hesapla", "İngilizce: Şarkı Çevir", "Türkçe: Paragraf Çöz"
         ];
-
-        const mySongs = [
+        const songs = [
             {n:"Dinlendirici Piyano", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"},
             {n:"Sakin Yağmur Sesi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
             {n:"Derin Odaklanma", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
-            {n:"Doğa ve Huzur", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"}
+            {n:"Hafif Doğa Sesi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"}
         ];
-
-        let timeLeft = 0, clock = null, sIdx = 0;
-        const player = document.getElementById('audio-engine');
-
-        function initApp() {
-            window.onclick = () => {
-                if(!player.src) {
-                    player.src = mySongs[0].s;
-                    document.getElementById('song-title').innerText = "🎵 " + mySongs[0].n;
-                }
-                player.play();
-                window.onclick = null;
-            };
-        }
-
-        function nextSong() {
-            sIdx = (sIdx + 1) % mySongs.length;
-            player.src = mySongs[sIdx].s;
-            document.getElementById('song-title').innerText = "🎵 " + mySongs[sIdx].n;
-            player.play();
-        }
-
-        function stopSong() { player.pause(); document.getElementById('song-title').innerText = "🔇 Kapalı"; }
-
-        function newTask() {
-            if(clock) clearInterval(clock);
-            document.getElementById('task-text').innerText = myTasks[Math.floor(Math.random() * myTasks.length)];
-            timeLeft = 25 * 60; // 25 Dakika Sabit
-            updateTimer();
-            clock = setInterval(() => {
-                if(timeLeft > 0) {
-                    timeLeft--;
-                    updateTimer();
-                } else {
-                    clearInterval(clock);
-                    document.getElementById('task-text').innerText = "GÖREV BİTTİ!";
-                }
+        let sec = 0, tid = null, sidx = 0;
+        const p = document.getElementById('player');
+        function init() { window.onclick = () => { if(!p.src){ p.src=songs[0].s; document.getElementById('m-status').innerText="🎵 "+songs[0].n; } p.play(); window.onclick=null; }; }
+        function next(){ sidx=(sidx+1)%songs.length; p.src=songs[sidx].s; document.getElementById('m-status').innerText="🎵 "+songs[sidx].n; p.play(); }
+        function stop(){ p.pause(); document.getElementById('m-status').innerText="🔇 Kapalı"; }
+        function start(){
+            if(tid) clearInterval(tid);
+            document.getElementById('task').innerText = tasks[Math.floor(Math.random()*tasks.length)];
+            sec = 25 * 60; // 25 Dakika
+            tid = setInterval(() => {
+                if(sec > 0){ sec--; let m=Math.floor(sec/60), s=sec%60; document.getElementById('timer').innerText=(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
             }, 1000);
-        }
-
-        function updateTimer() {
-            let m = Math.floor(timeLeft / 60);
-            let s = timeLeft % 60;
-            document.getElementById('timer-display').innerText = (m < 10 ? '0' + m : m) + ":" + (s < 10 ? '0' + s : s);
         }
     </script>
 </body>
 </html>
 EOF
 git add .
-git commit -m "Turkce muzik ve temiz ekran guncellemesi"
+git commit -m "Son guncelleme"
 git push origin main --force
 
