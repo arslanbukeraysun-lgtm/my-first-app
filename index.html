@@ -6,23 +6,24 @@ cat << 'EOF' > index.html
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAREZMİ PANEL</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #000; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://harezmi-snowy.vercel.app/bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; }
-        .panel { width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        body { margin: 0; padding: 0; background-color: #000; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('./bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+        .panel { width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
         .brand-header { font-size: 3.5rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px rgba(0, 242, 255, 0.6); margin-bottom: 5px; }
         #timer-display { font-size: 5rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
-        .btn-main { background: #ff0000; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        .music-control { margin-top: 15px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid #00f2ff; }
-        .btn-control { background: rgba(255,255,255,0.1); color: white; border: 1px solid #444; padding: 8px 18px; border-radius: 20px; cursor: pointer; margin: 5px; }
+        .btn-main { background: #ff0000; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
+        .btn-main:hover { transform: scale(1.1); background: #cc0000; }
+        .music-control { margin-top: 15px; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 20px; border: 1px solid #00f2ff; backdrop-filter: blur(5px); }
+        .btn-control { background: rgba(255,255,255,0.1); color: white; border: 1px solid #444; padding: 8px 18px; border-radius: 20px; cursor: pointer; margin: 5px; font-size: 0.8rem; }
     </style>
 </head>
 <body onload="initApp()">
     <div class="panel">
         <div class="brand-header">HAREZMİ</div>
-        <div id="task-display" style="font-size: 1.2rem; color: #ccc;">ODAKLANMAYA HAZIR MISIN?</div>
+        <div id="task-display" style="font-size: 1.2rem; color: #ccc; font-weight: 500;">ODAKLANMAYA HAZIR MISIN?</div>
         <div id="timer-display">00:00</div>
         <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button>
         <div class="music-control">
-            <p id="song-name" style="font-size: 0.9rem; color: #00f2ff;">🎵 Müzik Hazır (Dokun)</p>
+            <p id="song-name" style="font-size: 0.9rem; color: #00f2ff; margin-bottom: 10px;">🎵 Müzik Hazır (Dokun)</p>
             <button onclick="changeSong()" class="btn-control" style="border-color:#00f2ff;">DEĞİŞTİR</button>
             <button onclick="stopMusic()" class="btn-control" style="border-color:#ff4444;">KAPAT</button>
         </div>
@@ -42,5 +43,4 @@ cat << 'EOF' > index.html
 </body>
 </html>
 EOF
-git add . ; git commit -m "Final Tamir" ; git push origin main --force
 
