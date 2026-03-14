@@ -4,115 +4,47 @@ cat << 'EOF' > index.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAREZMİ PANEL V3</title>
+    <title>HAREZMİ PANEL</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #000; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('./bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; }
-        .panel { width: 90%; max-width: 500px; padding: 30px; border-radius: 30px; background: rgba(0,0,0,0.75); border: 2px solid #00f2ff; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); backdrop-filter: blur(10px); z-index: 10; }
-        .brand-header { font-size: 3.8rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px rgba(0, 242, 255, 0.8); margin-bottom: 5px; letter-spacing: 2px; }
-        #task-display { font-size: 1.3rem; color: #fff; margin: 15px 0; min-height: 4rem; display: flex; align-items: center; justify-content: center; font-weight: 500; line-height: 1.4; }
-        #timer-display { font-size: 5.5rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: 'Courier New', Courier, monospace; text-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
-        .btn-main { background: #ff0000; color: white; border: none; padding: 18px 45px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 20px rgba(255,0,0,0.4); text-transform: uppercase; }
-        .btn-main:hover { transform: scale(1.05); background: #cc0000; box-shadow: 0 8px 25px rgba(255,0,0,0.6); }
-        .music-control { margin-top: 25px; padding: 15px; border-top: 1px solid rgba(0,242,255,0.3); }
-        #song-name { font-size: 1rem; color: #00f2ff; margin-bottom: 15px; font-weight: bold; }
-        .btn-control { background: rgba(0, 242, 255, 0.1); color: white; border: 1px solid #00f2ff; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin: 5px; transition: 0.2s; }
-        .btn-control:hover { background: rgba(0, 242, 255, 0.3); }
+        body { margin: 0; padding: 0; background-color: #000; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+        .panel { width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
+        .brand-header { font-size: 4rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px rgba(0, 242, 255, 0.8); margin-bottom: 10px; }
+        #task-display { font-size: 1.5rem; color: #fff; margin: 15px 0; min-height: 3rem; font-weight: 500; }
+        #timer-display { font-size: 6rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; text-shadow: 0 0 15px rgba(255,0,0,0.3); }
+        .btn-main { background: #ff0000; color: white; border: none; padding: 20px 50px; border-radius: 50px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 20px rgba(255,0,0,0.4); }
+        .btn-main:hover { transform: scale(1.05); background: #cc0000; }
+        .music-box { margin-top: 30px; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 25px; border: 1px solid #00f2ff; backdrop-filter: blur(5px); }
+        .btn-ctrl { background: transparent; color: white; border: 1px solid #00f2ff; padding: 10px 25px; border-radius: 20px; cursor: pointer; margin: 5px; }
     </style>
 </head>
 <body onload="initApp()">
     <div class="panel">
         <div class="brand-header">HAREZMİ</div>
-        <div id="task-display">YENİ GÖREV İÇİN BUTONA BAS!</div>
+        <div id="task-display">BAŞLAMAYA HAZIR MISIN?</div>
         <div id="timer-display">00:00</div>
         <button class="btn-main" onclick="generateTask()">YENİ GÖREV AL</button>
-        <div class="music-control">
-            <p id="song-name">🎵 Müzik Hazır (Ekrana Dokun)</p>
-            <button onclick="changeSong()" class="btn-control">KANAL DEĞİŞTİR</button>
-            <button onclick="stopMusic()" class="btn-control" style="border-color:#ff4444; color:#ff4444;">SESİ KAPAT</button>
+        <div class="music-box">
+            <p id="song-name" style="color:#00f2ff; font-weight:bold;">🎵 Müzik Hazır</p>
+            <button onclick="changeSong()" class="btn-ctrl">DEĞİŞTİR</button>
+            <button onclick="stopMusic()" class="btn-ctrl" style="border-color:#ff4444;">KAPAT</button>
         </div>
     </div>
     <audio id="bg-audio" loop></audio>
-
     <script>
-        const tasks = [
-            "Matematik: 15 Problem Çöz", "Kitap: 25 Sayfa Oku", "Kodlama: Yeni Bir Fonksiyon Yaz", "İngilizce: 20 Yeni Kelime Ezberle",
-            "Tarih: Bir Konu Özeti Çıkar", "Coğrafya: Harita Çalışması Yap", "Fizik: 5 Formül Ezberle", "Kimya: Periyodik Tabloyu İncele",
-            "Biyoloji: Bir Hücre Şeması Çiz", "Edebiyat: Bir Şiir Oku", "Spor: 20 Şınav Çek", "Meditasyon: 5 Dakika Odaklan",
-            "Yazılım: GitHub Profilini Güncelle", "Matematik: Çarpım Tablosu Pratiği", "Türkçe: Yazım Kurallarını Tekrar Et",
-            "Dinlenme: Gözlerini 2 Dakika Kapat", "Su İç: Büyük Bir Bardak Su Bitir", "Müzik: Enstrümantal Bir Parça Dinle",
-            "Planlama: Yarının Listesini Hazırla", "Harezmi: Algoritma Mantığını Araştır", "Resim: Küçük Bir Karalama Yap",
-            "Düzen: Masanı Toparla", "Yazılım: CSS Flexbox Çalış", "Yazılım: JavaScript Döngüleri Tekrar Et",
-            "Problem: Mantık Bilmecesi Çöz", "Hız: 1 Dakika Boyunca Kelime Yaz", "Geometri: Üçgen Çeşitlerini Çiz",
-            "Felsefe: Bir Söz Üzerine Düşün", "Bilim: Bugünün Önemli Bir Olayını Oku", "Hafıza: 10 Kelimeyi Tersten Oku",
-            "Yazılım: API Nedir Araştır", "Matematik: Karekök Pratiği Yap", "İngilizce: Kısa Bir Metin Çevir",
-            "Genel Kültür: Bir Ülke Başkentini Öğren", "Teknoloji: Yapay Zeka Haberlerine Bak", "Odak: Telefondan Uzak Dur",
-            "Yazılım: HTML Form Etiketlerini Çalış", "Mantık: Satranç Hamlesi Düşün", "Eğitim: YouTube Eğitim Videosu İzle",
-            "Analiz: Hatalarını Gözden Geçir", "Fizik: Newton Kanunlarını Hatırla", "Kimya: Bir Deney Videosu İzle",
-            "Harezmi: 0 Sayısının Önemini Hatırla", "Yazılım: Vercel Deploy Ayarlarına Bak", "E-posta: Gelen Kutunu Temizle",
-            "Sözlük: Rastgele Bir Kelime Seç", "Bilgisayar: Masaüstünü Düzenle", "Proje: Bir Sonraki Adımı Planla",
-            "Motivasyon: Hedefini Kağıda Yaz", "İngilizce: Sesli Okuma Yap", "Gelişim: Bir Podcast Dinle",
-            "Yazılım: LocalStorage Nedir Öğren", "Matematik: Yüzde Hesaplaması Yap", "Harezmi: Cebir'in Temellerini Oku"
-        ];
-
-        const playlist = [
-            {n:"Lofi Chill", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
-            {n:"Deep Focus", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
-            {n:"Piano Solo", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"},
-            {n:"Rainy Mood", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
-            {n:"Cyber Beats", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"}
-        ];
-
-        let timeLeft = 0, timerId = null, songIndex = 0;
+        const tasks = ["Matematik Problemi Çöz", "Kitap Oku", "Kod Yaz", "Kelime Ezberle", "Spor Yap", "Resim Çiz"];
+        const playlist = [{n:"Lofi Beats", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"}, {n:"Deep Focus", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"}];
+        let timeLeft = 0, timerId = null, songIdx = 0;
         const audio = document.getElementById('bg-audio');
-
-        function initApp() {
-            window.onclick = () => {
-                if(!audio.src) {
-                    audio.src = playlist[0].s;
-                    document.getElementById('song-name').innerText = "🎵 " + playlist[0].n;
-                }
-                audio.play();
-                window.onclick = null;
-            };
-        }
-
-        function changeSong() {
-            songIndex = (songIndex + 1) % playlist.length;
-            document.getElementById('song-name').innerText = "🎵 " + playlist[songIndex].n;
-            audio.src = playlist[songIndex].s;
-            audio.play();
-        }
-
-        function stopMusic() {
-            audio.pause();
-            document.getElementById('song-name').innerText = "🔇 Kapalı";
-        }
-
-        function generateTask() {
-            if(timerId) clearInterval(timerId);
-            const r = tasks[Math.floor(Math.random()*tasks.length)];
-            document.getElementById('task-display').innerText = r;
-            timeLeft = 25 * 60; 
-            timerId = setInterval(() => {
-                if(timeLeft > 0) {
-                    timeLeft--;
-                    updateDisplay();
-                } else {
-                    clearInterval(timerId);
-                    document.getElementById('task-display').innerText = "TEBRİKLER, GÖREV BİTTİ!";
-                }
-            }, 1000);
-        }
-
-        function updateDisplay() {
-            let m=Math.floor(timeLeft/60), s=timeLeft%60;
-            document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-        }
+        function initApp() { window.onclick = () => { if(!audio.src){ audio.src=playlist[0].s; document.getElementById('song-name').innerText="🎵 "+playlist[0].n; } audio.play(); window.onclick=null; }; }
+        function changeSong() { songIdx=(songIdx+1)%playlist.length; audio.src=playlist[songIdx].s; document.getElementById('song-name').innerText="🎵 "+playlist[songIdx].n; audio.play(); }
+        function stopMusic() { audio.pause(); document.getElementById('song-name').innerText="🔇 Kapalı"; }
+        function generateTask() { if(timerId) clearInterval(timerId); document.getElementById('task-display').innerText = tasks[Math.floor(Math.random()*tasks.length)]; timeLeft = 25*60; timerId = setInterval(()=>{ if(timeLeft>0){ timeLeft--; updateDisp(); } },1000); }
+        function updateDisp() { let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer-display').innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`; }
     </script>
 </body>
 </html>
 EOF
 git add .
-git commit -m "Zengin icerik yuklendi ve temizlik yapildi"
+git commit -m "Ekran tamamiyle temizlendi"
 git push origin main --force
 
