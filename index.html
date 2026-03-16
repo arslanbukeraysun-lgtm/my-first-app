@@ -63,18 +63,18 @@ cat << 'EOF' > index.html
             {t: "Masanı Düzenle", d: 7}, {t: "Fizik Problemi Çöz", d: 40}, {t: "Biyoloji Hücre Çizimi", d: 25},
             {t: "Yeni Kod Yapısı Dene", d: 35}, {t: "Kitap Oku", d: 10}, {t: "Gözlerini Dinlendir", d: 5},
             {t: "Kimya Element Ezberle", d: 20}, {t: "Geometri Soru Çözümü", d: 30}, {t: "Kısa Bir Yürüyüş", d: 5},
-            {t: "Dosyalarını Düzenle", d: 10}, {t: "JS Metotları Tekrarı", d: 40}, {t: "Makale İncele", d: 25},
-            {t: "Zihnini Odakla", d: 15}, {t: "Yeni Bir Fonksiyon Yaz", d: 30}, {t: "Algoritma Tasarla", d: 45},
-            {t: "Derin Nefes Egzersizi", d: 5}, {t: "Harezmi Araştırması", d: 15}, {t: "Kod Analizi Yap", d: 30},
-            {t: "Problem Çözme Pratiği", d: 25}, {t: "Gelecek Planı Yap", d: 10}, {t: "Hızlı Okuma Egzersizi", d: 15},
-            {t: "Kelime Dağarcığını Geliştir", d: 20}, {t: "Mantık Bulmacası Çöz", d: 15}, {t: "Proje Taslağı Hazırla", d: 40}
+            {t: "Dosyalarını Düzenle", d: 10}, {t: "JS Metotları Tekrarı", d: 40}, {t: "Makale İncele", d: 25}
         ];
 
-        // 200'e tamamlamak için tertemiz, sayısız görev havuzu
-        const pool = ["Odaklan", "Harekete Geç", "Zihnini Boşalt", "Verimli Çalış", "Gelişimi Hisset", "Yenilik Dene", "Kendini Eğit", "Konsantrasyon Sağla", "Başarıya Odaklan", "Tempoyu Artır"];
+        // Sayısız ve parantezsiz 200 görev havuzu
+        const pool = [
+            "Odaklanmaya Devam Et", "Harekete Geç", "Zihnini Boşalt", "Verimli Çalış", 
+            "Gelişimi Hisset", "Yenilik Dene", "Kendini Eğit", "Konsantrasyon Sağla", 
+            "Başarıya Odaklan", "Tempoyu Artır", "Analiz Yap", "Yeni Algoritma Kur"
+        ];
+        
         while(taskData.length < 200) {
             let p = pool[Math.floor(Math.random()*pool.length)];
-            // Burada sayıları (taskData.length) tamamen kaldırdım
             taskData.push({t: p, d: (Math.floor(Math.random()*30)+10)});
         }
 
@@ -99,7 +99,7 @@ cat << 'EOF' > index.html
                 newIdx = Math.floor(Math.random() * taskData.length);
             } while (recentTasks.includes(newIdx));
             recentTasks.push(newIdx);
-            if(recentTasks.length > 15) recentTasks.shift(); // Hafızayı 15'e çıkararak daha iyi rastgelelik sağladım
+            if(recentTasks.length > 15) recentTasks.shift();
 
             const selected = taskData[newIdx];
             document.getElementById('task').innerText = selected.t;
@@ -121,5 +121,5 @@ cat << 'EOF' > index.html
 </html>
 EOF
 git add .
-git commit -m "Sayilar ve parantezler temizlendi"
+git commit -m "Sayılar ve parantezler kokten silindi"
 git push origin main --force
