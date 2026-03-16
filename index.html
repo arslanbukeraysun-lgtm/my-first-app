@@ -4,12 +4,11 @@ cat << 'EOF' > index.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAREZMİ PRO 200</title>
+    <title>HAREZMİ ODAK</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
         
-        /* Arka plan parlaklığı artırıldı (0.3 ve 0.5 olan değerler 0.1 ve 0.2 yapıldı) */
         .background {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.2)), url('./bg.jpg');
@@ -52,7 +51,7 @@ cat << 'EOF' > index.html
     <div class="background"></div>
     <div class="ui-layer">
         <h1>HAREZMİ</h1>
-        <div id="task">HAZIR MISIN? (200 GÖREV YÜKLENDİ)</div>
+        <div id="task">HAZIR MISIN?</div>
         <div id="timer">00:00</div>
         <button class="btn-main" onclick="startTimer()">YENİ GÖREV AL</button>
         
@@ -67,31 +66,26 @@ cat << 'EOF' > index.html
     <audio id="snd" loop></audio>
 
     <script>
-        // TAM 200 GÖREV VE SÜRELERİ
         const taskData = [
-            {t: "Matematik: Türev Çöz", d: 45}, {t: "İngilizce: 20 Kelime", d: 20}, {t: "Su İç ve 10 Şınav", d: 3},
-            {t: "Yazılım: Python Çalış", d: 50}, {t: "Edebiyat: Şiir Analizi", d: 15}, {t: "Tarih: Not Çıkar", d: 30},
-            {t: "Masanı Sil ve Düzenle", d: 7}, {t: "Fizik: Newton Yasaları", d: 40}, {t: "Biyoloji: Hücre Çiz", d: 25},
-            {t: "Kod: Yeni Bir API Bul", d: 35}, {t: "10 Dakika Kitap Oku", d: 10}, {t: "Gözlerini Dinlendir", d: 5},
-            {t: "Kimya: Element Ezber", d: 20}, {t: "Geometri: Üçgen Çöz", d: 30}, {t: "Mutfaktan Su Al Gel", d: 2},
-            {t: "E-postalarını Temizle", d: 10}, {t: "JS: Array Metotları", d: 40}, {t: "İngilizce Makale Oku", d: 25},
-            {t: "Coğrafya: Harita Çalış", d: 20}, {t: "Mantık Sorusu Çöz", d: 15}, {t: "Din Kültürü: Tekrar", d: 15},
-            {t: "Felsefe: Bir Söz Yorumla", d: 10}, {t: "Yazılım: CSS Flexbox", d: 30}, {t: "GitHub Profilini Bak", d: 15},
-            {t: "1 Dakika Plank Yap", d: 2}, {t: "Müzik Dinleyerek Hayal Kur", d: 5}, {t: "Harezmi Kimdir? Oku", d: 10},
-            {t: "Matematik: Logaritma", d: 45}, {t: "İngilizce Şarkı Çevir", d: 15}, {t: "Kimya: Mol Kavramı", d: 35}
-            // ... (Sistem 200'e tamamlamak için aşağıdaki döngüyle çeşitlendirilir)
+            {t: "Matematik Çöz", d: 45}, {t: "İngilizce Çalış", d: 20}, {t: "Su İç ve Esne", d: 3},
+            {t: "Yazılım Geliştir", d: 50}, {t: "Edebiyat Notu Çıkar", d: 15}, {t: "Tarih Tekrarı Yap", d: 30},
+            {t: "Masanı Düzenle", d: 7}, {t: "Fizik Problemi Çöz", d: 40}, {t: "Biyoloji Hücre Çizimi", d: 25},
+            {t: "Yeni Kod Yapısı Dene", d: 35}, {t: "Kitap Oku", d: 10}, {t: "Gözlerini Dinlendir", d: 5},
+            {t: "Kimya Element Ezberle", d: 20}, {t: "Geometri Soru Çözümü", d: 30}, {t: "Kısa Bir Yürüyüş", d: 5},
+            {t: "Dosyalarını Düzenle", d: 10}, {t: "JS Metotları Tekrarı", d: 40}, {t: "Makale İncele", d: 25}
         ];
 
-        // Görev sayısını 200'e tamamla
-        for(let i=1; i<=170; i++) {
-            taskData.push({t: "Gelişim Görevi #" + i + ": Odaklan!", d: (Math.floor(Math.random()*40)+5)});
+        // 200 görevi sayı olmadan çeşitlendirerek ekle
+        const extraTasks = ["Odaklanmaya Devam Et", "Derin Nefes Al", "Algoritma Düşün", "Yeni Kelime Öğren", "Projeni Geliştir", "Harekete Geç", "Zihnini Boşalt"];
+        while(taskData.length < 200) {
+            let randomT = extraTasks[Math.floor(Math.random()*extraTasks.length)];
+            taskData.push({t: randomT, d: (Math.floor(Math.random()*35)+10)});
         }
 
         const musicList = [
             {n:"Dinlendirici Piyano", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"},
             {n:"Sakin Yağmur", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
-            {n:"Derin Odaklanma", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
-            {n:"Gece Esintisi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"}
+            {n:"Derin Odaklanma", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"}
         ];
         
         let timeLeft = 0, timerId = null, mIdx = 0, lastIdx = -1;
@@ -115,8 +109,6 @@ cat << 'EOF' > index.html
 
         function startTimer() {
             if(timerId) clearInterval(timerId);
-            
-            // Gerçek rastgelelik: Aynı görev üst üste gelmez
             let newIdx;
             do { newIdx = Math.floor(Math.random() * taskData.length); } while (newIdx === lastIdx);
             lastIdx = newIdx;
@@ -132,7 +124,7 @@ cat << 'EOF' > index.html
                     document.getElementById('timer').innerText = (m<10?'0'+m:m)+":"+(s<10?'0'+s:s);
                 } else {
                     clearInterval(timerId);
-                    document.getElementById('task').innerText = "TEBRİKLER! GÖREV BİTTİ.";
+                    document.getElementById('task').innerText = "GÖREV BİTTİ!";
                 }
             }, 1000);
         }
@@ -141,6 +133,6 @@ cat << 'EOF' > index.html
 </html>
 EOF
 git add .
-git commit -m "200 gorev ve parlak arka plan guncellemesi"
+git commit -m "Yazi duzenlemeleri yapildi"
 git push origin main --force
 
