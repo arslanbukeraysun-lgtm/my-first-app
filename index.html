@@ -65,14 +65,17 @@ cat << 'EOF' > index.html
             {t: "Kimya Element Ezberle", d: 20}, {t: "Geometri Soru Çözümü", d: 30}, {t: "Kısa Bir Yürüyüş", d: 5},
             {t: "Dosyalarını Düzenle", d: 10}, {t: "JS Metotları Tekrarı", d: 40}, {t: "Makale İncele", d: 25},
             {t: "Zihnini Odakla", d: 15}, {t: "Yeni Bir Fonksiyon Yaz", d: 30}, {t: "Algoritma Tasarla", d: 45},
-            {t: "Derin Nefes Egzersizi", d: 5}, {t: "Harezmi Araştırması", d: 15}, {t: "Kod Analizi Yap", d: 30}
+            {t: "Derin Nefes Egzersizi", d: 5}, {t: "Harezmi Araştırması", d: 15}, {t: "Kod Analizi Yap", d: 30},
+            {t: "Problem Çözme Pratiği", d: 25}, {t: "Gelecek Planı Yap", d: 10}, {t: "Hızlı Okuma Egzersizi", d: 15},
+            {t: "Kelime Dağarcığını Geliştir", d: 20}, {t: "Mantık Bulmacası Çöz", d: 15}, {t: "Proje Taslağı Hazırla", d: 40}
         ];
 
-        // 200'e tamamlamak için benzersiz görevler üret
-        const pool = ["Odaklan", "Harekete Geç", "Zihnini Boşalt", "Verimli Çalış", "Gelişimi Hisset", "Yenilik Dene", "Kendini Eğit"];
+        // 200'e tamamlamak için tertemiz, sayısız görev havuzu
+        const pool = ["Odaklan", "Harekete Geç", "Zihnini Boşalt", "Verimli Çalış", "Gelişimi Hisset", "Yenilik Dene", "Kendini Eğit", "Konsantrasyon Sağla", "Başarıya Odaklan", "Tempoyu Artır"];
         while(taskData.length < 200) {
             let p = pool[Math.floor(Math.random()*pool.length)];
-            taskData.push({t: p + " (" + taskData.length + ")", d: (Math.floor(Math.random()*30)+10)});
+            // Burada sayıları (taskData.length) tamamen kaldırdım
+            taskData.push({t: p, d: (Math.floor(Math.random()*30)+10)});
         }
 
         const musicList = [
@@ -82,7 +85,7 @@ cat << 'EOF' > index.html
         ];
         
         let timeLeft = 0, timerId = null, mIdx = 0;
-        let recentTasks = []; // Son gelenleri tutan liste
+        let recentTasks = [];
 
         const player = document.getElementById('snd');
         function init() { window.onclick = () => { if(!player.src) { player.src = musicList[0].s; document.getElementById('m-info').innerText = "🎵 " + musicList[0].n; } player.play(); window.onclick = null; }; }
@@ -91,15 +94,12 @@ cat << 'EOF' > index.html
 
         function startTimer() {
             if(timerId) clearInterval(timerId);
-            
             let newIdx;
-            // Son 10 görevden biri olmasın diye döngüye sokuyoruz
             do {
                 newIdx = Math.floor(Math.random() * taskData.length);
             } while (recentTasks.includes(newIdx));
-
             recentTasks.push(newIdx);
-            if(recentTasks.length > 10) recentTasks.shift(); // Hafızayı 10'da tut
+            if(recentTasks.length > 15) recentTasks.shift(); // Hafızayı 15'e çıkararak daha iyi rastgelelik sağladım
 
             const selected = taskData[newIdx];
             document.getElementById('task').innerText = selected.t;
@@ -121,6 +121,5 @@ cat << 'EOF' > index.html
 </html>
 EOF
 git add .
-git commit -m "Gelistirilmis rastgelelik sistemi"
+git commit -m "Sayilar ve parantezler temizlendi"
 git push origin main --force
-
