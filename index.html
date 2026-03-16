@@ -7,152 +7,95 @@ cat << 'EOF' > index.html
     <title>HAREZMİ ODAK</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
-        .bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./bg.jpg');
-            background-size: cover; background-position: center; z-index: 1;
+        body, html { 
+            width: 100%; height: 100%; overflow: hidden; 
+            background: #000; font-family: 'Segoe UI', sans-serif; 
         }
-        .main {
-            position: relative; z-index: 10; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .panel {
-            background: rgba(0, 0, 0, 0.85); border: 2px solid #00f2ff;
-            padding: 30px; border-radius: 40px; text-align: center;
-            width: 90%; max-width: 420px; backdrop-filter: blur(15px);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
-        }
-        h1 { font-size: 3.5rem; color: #00f2ff; text-shadow: 0 0 20px #00f2ff; margin-bottom: 5px; }
-        #task { font-size: 1.2rem; color: #fff; margin: 15px 0; min-height: 3rem; font-weight: bold; text-transform: uppercase; display: flex; align-items: center; justify-content: center; }
-        #timer { font-size: 6rem; font-weight: bold; color: #ff4444; margin: 5px 0; font-family: monospace; }
-        .btn-main { background: #ff0000; color: #fff; border: none; padding: 18px 45px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.3rem; margin: 10px 0; }
-        .m-zone { margin-top: 20px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 20px; }
-        .btn-m { background: transparent; color: #fff; border: 1px solid #00f2ff; padding: 10px 20px; border-radius: 20px; margin: 5px; cursor: pointer; }
-    </style>
-cat << 'EOF' > index.html
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAREZMİ ODAK</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
         
-        /* Arka plan fotoğrafını tam ekran ve temiz yapan katman */
-        .bg-fixed {
+        /* Arka plan fotoğrafını tam ekran ve pürüzsüz yapar */
+        .bg-img {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./bg.jpg');
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('./bg.jpg');
             background-size: cover; background-position: center; z-index: 1;
         }
 
-        /* Paneli tam ortaya sabitleyen şeffaf ana container */
-        .main-container {
+        /* İçeriği ekranın alt-orta kısmına, fotoğrafla birleşecek şekilde yerleştirir */
+        .content-layer {
             position: relative; z-index: 10; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            padding-bottom: 50px; /* Paneli biraz aşağıya çeker */
         }
 
-        /* Paylaştığın fotodaki şeffaf ve bütünleşmiş panel tasarımı */
-        .glass-panel {
-            background: rgba(0, 0, 0, 0.8); border: 2px solid #00f2ff;
-            padding: 35px; border-radius: 40px; text-align: center;
-            width: 88%; max-width: 420px; backdrop-filter: blur(15px);
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3);
+        /* Cam (Glassmorphism) efekti: Fotoğrafla bütünleşik görünüm */
+        .glass-ui {
+            background: rgba(0, 0, 0, 0.6); /* Daha şeffaf */
+            padding: 30px 20px; border-radius: 50px; text-align: center;
+            width: 90%; max-width: 400px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        h1 { font-size: 3.5rem; font-weight: 900; color: #00f2ff; text-shadow: 0 0 20px #00f2ff; margin-bottom: 5px; }
-        #task-text { font-size: 1.25rem; color: #fff; margin: 15px 0; min-height: 3rem; font-weight: bold; text-transform: uppercase; display: flex; align-items: center; justify-content: center; }
-        #timer-display { font-size: 6rem; font-weight: bold; color: #ff4444; margin: 10px 0; font-family: monospace; }
-        .btn-main { background: #ff0000; color: white; border: none; padding: 18px 45px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2rem; margin: 15px 0; transition: 0.3s; }
-        .btn-main:active { transform: scale(0.95); }
+        h1 { font-size: 3rem; color: #00f2ff; text-shadow: 0 0 15px #00f2ff; margin-bottom: 5px; }
+        #task { font-size: 1.1rem; color: #fff; margin: 10px 0; min-height: 2.5rem; font-weight: 600; }
+        #timer { font-size: 5.5rem; font-weight: bold; color: #ff4444; margin: 5px 0; font-family: monospace; }
+        
+        .btn-start { 
+            background: #ff0000; color: #fff; border: none; padding: 15px 40px; 
+            border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.3);
+        }
 
-        .music-area { margin-top: 25px; border-top: 1px solid rgba(0,242,255,0.2); padding-top: 20px; }
-        .btn-small { background: transparent; color: white; border: 1px solid #00f2ff; padding: 10px 22px; border-radius: 20px; margin: 5px; cursor: pointer; font-size: 0.9rem; }
+        .music-ctrl { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-m { background: transparent; color: #fff; border: 1px solid #00f2ff; padding: 8px 18px; border-radius: 20px; margin: 5px; font-size: 0.8rem; }
     </style>
 </head>
-<body onload="initApp()">
-    <div class="bg-fixed"></div>
-    <div class="main-container">
-        <div class="glass-panel">
+<body onload="init()">
+    <div class="bg-img"></div>
+    <div class="content-layer">
+        <div class="glass-ui">
             <h1>HAREZMİ</h1>
-            <div id="task-text">BAŞLAMAK İÇİN BUTONA BAS</div>
-            <div id="timer-display">00:00</div>
-            <button class="btn-main" onclick="newTask()">YENİ GÖREV AL</button>
-            
-            <div class="music-area">
-                <p id="song-name" style="color:#00f2ff; margin-bottom:12px; font-weight:bold;">🎵 Müzik Hazır (Dokun)</p>
-                <button class="btn-small" onclick="nextSong()">DEĞİŞTİR</button>
-                <button class="btn-small" onclick="stopSong()" style="border-color:#ff4444;">KAPAT</button>
+            <div id="task">HAZIR MISIN?</div>
+            <div id="timer">00:00</div>
+            <button class="btn-start" onclick="start()">YENİ GÖREV AL</button>
+            <div class="music-ctrl">
+                <p id="m-txt" style="color:#00f2ff; font-size: 0.9rem; margin-bottom:10px;">🎵 Dinlendirici Müzik</p>
+                <button onclick="next()" class="btn-m">DEĞİŞTİR</button>
+                <button onclick="stop()" class="btn-m" style="border-color:#ff4444;">KAPAT</button>
             </div>
         </div>
     </div>
-    <audio id="player" loop></audio>
-
+    <audio id="audio" loop></audio>
     <script>
-        const tasks = [
-            "Matematik: 15 Soru Çöz", "Kitap: 20 Sayfa Oku", "Kodlama: Yeni Fonksiyon Yaz", "İngilizce: 15 Kelime Ezberle",
-            "Tarih: Bir Konu Özeti", "Fizik: 5 Formül Ezberle", "Kimya: Elementler Tekrar", "Biyoloji: Hücre Çiz",
-            "Spor: 20 Şınav Çek", "Su İç: Büyük Bir Bardak", "Düzen: Masanı Toparla", "Yazılım: GitHub Commit Yap",
-            "Harezmi: Algoritma Araştır", "Mantık: Bir Bilmece Çöz", "İngilizce: Metin Çevir", "Türkçe: Yazım Kuralları Bak",
-            "Coğrafya: Ülke Konumları", "Resim: Bir Karalama Yap", "Teknoloji: Yapay Zeka Haberi", "Yazılım: CSS Grid Bak",
-            "Fizik: Newton Yasaları", "Biyoloji: Bitki Yapısı", "Edebiyat: Yazar Hayatı", "Matematik: Karekök Çalış",
-            "Yazılım: LocalStorage Nedir?", "Matematik: Yüzde Hesapla", "İngilizce: Şarkı Çevir", "Türkçe: Paragraf Çöz"
+        const tasks = ["Matematik Çöz", "Kitap Oku", "Kod Yaz", "Kelime Ezberle", "Özet Çıkar", "Spor Yap", "Su İç", "Algoritma Kur"];
+        const tracks = [
+            {n:"Piyano", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"},
+            {n:"Yağmur", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
+            {n:"Odaklanma", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"}
         ];
+        let sec = 0, tid = null, idx = 0;
+        const player = document.getElementById('audio');
 
-        const songs = [
-            {n:"Dinlendirici Piyano", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"},
-            {n:"Sakin Yağmur Sesi", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
-            {n:"Derin Odaklanma", s:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"}
-        ];
-
-        let timeLeft = 0, timerInterval = null, sIdx = 0;
-        const audio = document.getElementById('player');
-
-        function initApp() {
+        function init() {
             window.onclick = () => {
-                if(!audio.src) {
-                    audio.src = songs[0].s;
-                    document.getElementById('song-name').innerText = "🎵 " + songs[0].n;
-                }
-                audio.play();
-                window.onclick = null;
+                if(!player.src) { player.src=tracks[0].s; document.getElementById('m-txt').innerText="🎵 "+tracks[0].n; }
+                player.play(); window.onclick=null;
             };
         }
-
-        function nextSong() {
-            sIdx = (sIdx + 1) % songs.length;
-            audio.src = songs[sIdx].s;
-            document.getElementById('song-name').innerText = "🎵 " + songs[sIdx].n;
-            audio.play();
-        }
-
-        function stopSong() { audio.pause(); document.getElementById('song-name').innerText = "🔇 Kapalı"; }
-
-        function newTask() {
-            if(timerInterval) clearInterval(timerInterval);
-            document.getElementById('task-text').innerText = tasks[Math.floor(Math.random()*tasks.length)];
-            timeLeft = 25 * 60; // 25 Dakika Sabit
-            timerInterval = setInterval(() => {
-                if(timeLeft > 0) {
-                    timeLeft--;
-                    updateDisplay();
-                } else {
-                    clearInterval(timerInterval);
-                    document.getElementById('task-text').innerText = "TEBRİKLER, GÖREV TAMAMLANDI!";
-                }
+        function next() { idx=(idx+1)%tracks.length; player.src=tracks[idx].s; document.getElementById('m-txt').innerText="🎵 "+tracks[idx].n; player.play(); }
+        function stop() { player.pause(); document.getElementById('m-txt').innerText="🔇 Kapalı"; }
+        function start() {
+            if(tid) clearInterval(tid);
+            document.getElementById('task').innerText = tasks[Math.floor(Math.random()*tasks.length)];
+            sec = 25 * 60;
+            tid = setInterval(() => {
+                if(sec > 0){ sec--; let m=Math.floor(sec/60), s=sec%60; document.getElementById('timer').innerText=(m<10?'0'+m:m)+":"+(s<10?'0'+s:s); }
             }, 1000);
-        }
-
-        function updateDisplay() {
-            let m=Math.floor(timeLeft/60), s=timeLeft%60;
-            document.getElementById('timer-display').innerText = (m<10?'0'+m:m)+":"+(s<10?'0'+s:s);
         }
     </script>
 </body>
 </html>
 EOF
 git add .
-git commit -m "Panel fotografla bütünleşti"
+git commit -m "Fotograf ile bütünleşmiş şeffaf tasarım"
 git push origin main --force
+
